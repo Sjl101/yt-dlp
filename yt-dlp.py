@@ -209,6 +209,7 @@ class VideoDownloaderApp:
                 ydl.download([url])
 
             print(f"Video downloaded successfully from URL at {download_speed}MB/s: {url}")
+            print(Fore.MAGENTA + "-------------------------------------------------------------------------" + Fore.RESET)
             return True, video_name, download_speed
 
         except Exception as e:
@@ -254,6 +255,7 @@ class VideoDownloaderApp:
                 ydl.download([url])
 
             print(f"Video downloaded successfully from URL at {download_speed}MB/s: {url}")
+            print(Fore.MAGENTA + "-------------------------------------------------------------------------" + Fore.RESET)
             return True, video_name, download_speed
 
         except Exception as e:
@@ -286,6 +288,7 @@ class VideoDownloaderApp:
                 ydl.download([url])
 
             print(f"Video downloaded successfully from URL at {download_speed}MB/s: {url}")
+            print(Fore.MAGENTA + "-------------------------------------------------------------------------" + Fore.RESET)
             return True, video_name, download_speed
 
         except Exception as e:
@@ -323,6 +326,7 @@ class VideoDownloaderApp:
                 ydl.download([url])
 
             print(f"Video downloaded successfully from URL at {download_speed}MB/s: {url}")
+            print(Fore.MAGENTA + "-------------------------------------------------------------------------" + Fore.RESET)
             return True, video_name, download_speed
 
         except Exception as e:
@@ -339,7 +343,7 @@ class VideoDownloaderApp:
 
     def move_to_urllog_file(self, url):
         with open(self.urllog_file, "a") as f:
-            f.write(datetime.now() + url + "\n")
+            f.write(str(datetime.now()) + url + "\n")
 
     def remove_from_input_file(self, url):
         script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -420,7 +424,7 @@ if __name__ == '__main__':
             filename = input(Fore.WHITE + "Enter the input file name (including .txt): ")
             app.load_urls_from_file(filename)
         elif choice == '3' and not app.running:
-            playlisturl = input(Fore.WHITE + "Enter Playlist ID: ")
+            playlisturl = input(Fore.WHITE + "Enter Playlist URL: ")
             app.extract_playlist(playlisturl)
         elif choice == '4' and not app.running:
             channelid = input(Fore.WHITE + "Enter channel ID: ")
