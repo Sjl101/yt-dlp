@@ -26,7 +26,7 @@ class VideoDownloaderApp:
             'd': "DDD   \nD   D \nD   D \nDDD   ",
             'l': "L     \nL     \nL     \nLLL   ",
             'p': "PPP  \nP  P \nPPP  \nP    "
-}
+        }
 
 
         line = '-' * (len(text) * 5 + 8)
