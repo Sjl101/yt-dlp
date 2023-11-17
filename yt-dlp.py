@@ -7,6 +7,7 @@ from pytube import Playlist
 from colorama import Fore, Back, Style
 import scrapetube
 from pydub import AudioSegment
+from datetime import datetime
 
 class VideoDownloaderApp:
     def __init__(self):
@@ -48,7 +49,7 @@ class VideoDownloaderApp:
 
     def load_urls_from_file(self, filename):
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(script_directory, filename)
+        file_path = os.path.join(script_directory, "input", filename)
 
         try:
             with open(file_path, 'r') as file:
@@ -338,7 +339,7 @@ class VideoDownloaderApp:
 
     def move_to_urllog_file(self, url):
         with open(self.urllog_file, "a") as f:
-            f.write(url + "\n")
+            f.write(datetime.now() + url + "\n")
 
     def remove_from_input_file(self, url):
         script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -373,9 +374,12 @@ class VideoDownloaderApp:
 
     def convert_mp4_to_mp3(self, input_file, output_file):
         try:
+            if not os.path.exists("mp3_output"):
+                # Create a new directory because it does not exist
+                os.makedirs("mp3_output")
             script_directory = os.path.dirname(os.path.abspath(__file__))
-            file_path = os.path.join(script_directory, input_file)
-            output_path = os.path.join(script_directory, output_file)
+            file_path = os.path.join(script_directory, "input",input_file)
+            output_path = os.path.join(script_directory, "mp3_output", output_file)
             command = f"ffmpeg -i {str(file_path)} -vn -acodec libmp3lame {str(output_path)}"
             os.system(command)
             print(f"Conversion successful! MP3 file saved as {output_path}")
@@ -386,6 +390,9 @@ class VideoDownloaderApp:
 if __name__ == '__main__':
     app = VideoDownloaderApp()
     while True:
+        if not os.path.exists("input"):
+                # Create a new directory because it does not exist
+                os.makedirs("input")
         os.system('cls' if os.name == 'nt' else 'clear')
         app.print_large_ascii_art("yt-dlp")
         print(Style.DIM + Fore.WHITE + Back.MAGENTA + "By. Sjl101"+ Back.RESET)
@@ -402,7 +409,7 @@ if __name__ == '__main__':
         print(Fore.GREEN + "7. Start processing no thumbnail")
         print(Fore.GREEN + "8. Start processing as a MP3 file")
         print(Fore.CYAN + "9. Show list")
-        print(Fore.WHITE + "10. Convert mp4 file to mp4 format")
+        print(Fore.WHITE + "10. Convert mp4 file to mp3 format")
         if not app.running:
             print(Fore.RED + "11. Exit") 
         choice = input(Fore.WHITE + "Enter your choice: ")
@@ -413,7 +420,7 @@ if __name__ == '__main__':
             filename = input(Fore.WHITE + "Enter the input file name (including .txt): ")
             app.load_urls_from_file(filename)
         elif choice == '3' and not app.running:
-            playlisturl = input(Fore.WHITE + "Enter Playlist URL: ")
+            playlisturl = input(Fore.WHITE + "Enter Playlist ID: ")
             app.extract_playlist(playlisturl)
         elif choice == '4' and not app.running:
             channelid = input(Fore.WHITE + "Enter channel ID: ")
