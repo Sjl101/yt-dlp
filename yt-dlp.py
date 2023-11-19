@@ -8,6 +8,9 @@ from colorama import Fore, Back, Style
 import scrapetube
 from pydub import AudioSegment
 from datetime import datetime
+import asyncio
+import aiohttp
+from bs4 import BeautifulSoup
 
 class VideoDownloaderApp:
     def __init__(self):
@@ -390,6 +393,26 @@ class VideoDownloaderApp:
         except Exception as e:
             print(f"Error: {e}")
 
+    async def fetch_title(self, session, url):
+        try:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, 'html.parser')
+                    title = soup.title.string.strip() if soup.title else "Title not found"
+                    return title
+                else:
+                    return f"Failed to fetch URL: {url}. Status code: {response.status}"
+        except aiohttp.ClientError as e:
+            return f"Error fetching URL {url}: {e}"
+        except Exception as ex:
+            return f"Exception occurred for {url}: {ex}"
+
+    async def get_titles(self, urls):
+        async with aiohttp.ClientSession() as session:
+            tasks = [app.fetch_title(session, url) for url in urls]
+            results = await asyncio.gather(*tasks)
+            return results
 
 if __name__ == '__main__':
     app = VideoDownloaderApp()
@@ -442,7 +465,11 @@ if __name__ == '__main__':
             app.start_processing_audio()   
         elif choice == '9':
             os.system('cls' if os.name == 'nt' else 'clear')
-            print(Fore.WHITE + "\n".join(app.links))
+            loop = asyncio.get_event_loop()
+            titles = loop.run_until_complete(app.get_titles(app.links))
+            for url, title in zip(app.links, titles):
+                print(Fore.WHITE + f"{url}: {title}")
+                
             input(Fore.GREEN + "Press Enter to continue...")
         elif choice == "10":
             file_path = input(Fore.WHITE + "Enter the input file name (including .mp4): ")
