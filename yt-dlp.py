@@ -61,9 +61,9 @@ class VideoDownloaderApp:
                     self.links.append(url)
                     print(f"Added URL from file: {url}")
         except FileNotFoundError:
-            print(f"File not found in directory: {script_directory}")
+            input(f"File not found in directory: {script_directory}")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            input(f"An error occurred: {e}")
 
 
 
@@ -216,8 +216,7 @@ class VideoDownloaderApp:
             return True, video_name, download_speed
 
         except Exception as e:
-            print(f"Error downloading video from URL: {url}: {e}")
-
+            input(f"Error downloading video from URL: {url}: {e}")
         return False, "", download_speed
     
     def run_youtube_dl_se(self, url, episode, season):
@@ -262,8 +261,7 @@ class VideoDownloaderApp:
             return True, video_name, download_speed
 
         except Exception as e:
-            print(f"Error downloading video from URL: {url}: {e}")
-
+            input(f"Error downloading video from URL: {url}: {e}")
         return False, "", download_speed
 
     def run_youtube_dl_nt(self, url):
@@ -295,8 +293,7 @@ class VideoDownloaderApp:
             return True, video_name, download_speed
 
         except Exception as e:
-            print(f"Error downloading video from URL: {url}: {e}")
-
+            input(f"Error downloading video from URL: {url}: {e}")
         return False, "", download_speed
 
     def run_youtube_dl_audio(self, url):
@@ -333,8 +330,7 @@ class VideoDownloaderApp:
             return True, video_name, download_speed
 
         except Exception as e:
-            print(f"Error downloading video from URL: {url}: {e}")
-
+            input(f"Error downloading video from URL: {url}: {e}")
         return False, "", download_speed
 
 
@@ -359,7 +355,7 @@ class VideoDownloaderApp:
                     if line.strip() != url:
                         file.write(line)
         except Exception as e:
-            print(f"Error removing URL from list: {url}: {e}")
+            input(f"Error removing URL from list: {url}: {e}")
 
     def print_progress(self, progress, download_speed):
         pass
@@ -391,7 +387,7 @@ class VideoDownloaderApp:
             os.system(command)
             print(f"Conversion successful! MP3 file saved as {output_path}")
         except Exception as e:
-            print(f"Error: {e}")
+            input(f"Error: {e}")
 
     async def fetch_title(self, session, url):
         try:
