@@ -11,10 +11,15 @@ from datetime import datetime
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
+from htmldate import find_date
+from urllib.parse import urlparse
+from datetime import datetime
+import requests
 
 class VideoDownloaderApp:
     def __init__(self):
         self.links = []
+        self.creation_dates = []
         self.failed_links = []
         self.error_file = "failed_links.txt"
         self.download_folder = "downloads"
@@ -48,6 +53,7 @@ class VideoDownloaderApp:
     def add_url(self, url):
         if url:
             self.links.append(url)
+            self.creation_dates.append(find_date(url))
             print(f"Added URL: {url}")
 
     def load_urls_from_file(self, filename):
@@ -59,6 +65,7 @@ class VideoDownloaderApp:
                 for line in file:
                     url = line.strip()
                     self.links.append(url)
+                    self.creation_dates.append(find_date(url))
                     print(f"Added URL from file: {url}")
         except FileNotFoundError:
             input(f"File not found in directory: {script_directory}")
@@ -365,6 +372,7 @@ class VideoDownloaderApp:
         video_urls = [video for video in playlist.video_urls]
         for url in video_urls:
             self.links.append(url)
+            self.creation_dates.append(find_date(url))
             print(f"Added URL from playlist: {url}")
 
     def extract_channel(self, channelid):
@@ -372,6 +380,7 @@ class VideoDownloaderApp:
 
         for video in videos:
             self.links.append("https://www.youtube.com/watch?v=" + video['videoId'])
+            self.creation_dates.append(find_date("https://www.youtube.com/watch?v=" + video['videoId']))
             print(f"Added URL from channel: https://www.youtube.com/watch?v={video['videoId']}")
         self.links.reverse()
 
@@ -409,6 +418,28 @@ class VideoDownloaderApp:
             tasks = [app.fetch_title(session, url) for url in urls]
             results = await asyncio.gather(*tasks)
             return results
+
+    def get_tab_name(self, url):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                # Extracting the title of the page or any specific element indicating the tab name
+                title = soup.title.string.strip() if soup.title else None
+                return title
+        except Exception as e:
+            input(f"Error processing URL {url}: {e}")
+        return None
+
+    def get_creation_date(self, url):
+        try:
+            parsed_url = urlparse(url)
+            html_date = find_date(url)
+            if html_date:
+                return datetime.strptime(html_date, '%Y-%m-%d')
+        except Exception as e:
+            input(f"Error processing URL {url}: {e}")
+        return None
 
 if __name__ == '__main__':
     app = VideoDownloaderApp()
@@ -463,10 +494,43 @@ if __name__ == '__main__':
             os.system('cls' if os.name == 'nt' else 'clear')
             loop = asyncio.get_event_loop()
             titles = loop.run_until_complete(app.get_titles(app.links))
+            listcount = 0
             for url, title in zip(app.links, titles):
-                print(Fore.WHITE + f"{url}: {title}")
-                
-            input(Fore.GREEN + "Press Enter to continue...")
+                listcount += 1
+                print(Fore.WHITE + f"{listcount}. {url}: {title}: Created: {find_date(url)}")
+            print(Fore.MAGENTA + f"-----------------------------------------------------------------")
+            print(Fore.CYAN + f"1. Sort by title")
+            print(Fore.CYAN + f"2. Sort by creation date")
+            print(Fore.CYAN + f"3. Reverse list")
+            print(Fore.CYAN + f"4. Remove URL from list")
+            print(Fore.CYAN + f"5. Remove all from list")
+            print(Fore.CYAN + f"6. Exit list...")
+            listchoice = input(Fore.WHITE + "Enter your choice: ")
+            if listchoice == '1':
+                print(Fore.WHITE + f"Sorting based on tab name")
+                app.links.sort(key=app.get_tab_name)
+                input(Fore.CYAN + f"Sorted! Press Enter to continue...")
+            elif listchoice == '2':
+                print(Fore.WHITE + f"Sorting based on creation date")
+                app.links.sort(key=app.get_creation_date)
+                input(Fore.GREEN + "Sorted! Press Enter to continue...")
+            elif listchoice == '3':
+                print(Fore.WHITE + f"Reversing list")
+                app.links.reverse()
+                input(Fore.CYAN + f"Sorted! Press Enter to continue...")
+            elif listchoice == '4':
+                indexinput = input(Fore.WHITE + f"Enter index for deletion: ")
+                index = int(indexinput) - 1
+                deletedurl = app.links[index]
+                app.links.pop(index)
+                input(Fore.CYAN + f"Removed {deletedurl} from list! Press Enter to continue...")
+            elif listchoice == '5':
+                print(Fore.WHITE + f"Clearing list")
+                app.links.clear()
+                input(Fore.CYAN + f"Cleared list! Press Enter to continue...")
+            elif listchoice == '6':
+                print(Fore.WHITE + f"")
+            #input(Fore.GREEN + "Press Enter to continue...")
         elif choice == "10":
             file_path = input(Fore.WHITE + "Enter the input file name (including .mp4): ")
             output_path = input(Fore.WHITE + "Enter the name for the output file (including .mp3): ")
