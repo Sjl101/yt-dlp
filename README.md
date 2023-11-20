@@ -1,7 +1,10 @@
 # yt-dlp
 a program i made using yt-dlp that allows you to mass download videos and some other features
+for the program to work you need to install the requirements.txt fil
 
-to download and run the program you only need the yt-dlp.py file
+    $ pip install -r requirements.txt
+
+to download and run the program you only need to run the yt-dlp.py file
 and to run the program use the following command
 
     python .\yt-dlp.py
