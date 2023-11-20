@@ -7,7 +7,7 @@ for the program to work you need to install the requirements.txt fil
 to download and run the program you only need to run the yt-dlp.py file
 and to run the program use the following command
 
-    python .\yt-dlp.py
+    $ python .\yt-dlp.py
 
 
 ![alt text](https://github.com/Sjl101/yt-dlp/blob/main/pic1.png?raw=true)
